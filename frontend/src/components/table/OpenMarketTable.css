@@ -1,0 +1,88 @@
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .form-label {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  .form-select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 1rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    color: #333;
+    background-color: #fff;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  
+  .form-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.25);
+  }
+  
+  .table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+  
+  .table th,
+  .table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .table th {
+    font-weight: bold;
+    color: #333;
+    background-color: #f2f2f2;
+  }
+  
+  .table tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  
+ 
+  
+  @media screen and (max-width: 768px) {
+    .form-select {
+      font-size: 0.9rem;
+    }
+  
+    .card-title {
+      font-size: 1.2rem;
+    }
+  
+    .table th,
+    .table td {
+      padding: 6px;
+    }
+  }
+
+  .small-select {
+    height: 35px; 
+ }
+ .table-heading{
+  font-size: 16px !important;
+  font-weight: 650 !important;
+  font-family: Arial, sans-serif !important;
+  color: #333 !important;
+  transition: background-color 0.3s ease !important;
+}

@@ -1,23 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import "./App.css";
+import OpenMarketTable from "./components/table/OpenMarketTable.js";
+import FacilitiesTable from "./components/table/FacilitiesTable.js";
+import CombinedTable from "./components/table/CombinedTable.js";
+import BusinessClassAnalysis from "./businessclass/BusinessClassAnalysis.js";
+import ReactChatBox from "./components/box/ReactChatBox.js"
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="container-fluid">
+        <div className="row">
+          <div className="col-lg-4 col-md-6">
+            <OpenMarketTable />
+          </div>
+
+          <div className="col-lg-4 col-md-6">
+            <FacilitiesTable />
+          </div>
+       
+          <div className="col-lg-4 col-md-6">
+            <CombinedTable />
+          </div>
+        </div>
+      </div>
+      <ReactChatBox/>
+      <BusinessClassAnalysis/>
+      <ReactChatBox/>
     </div>
   );
 }
