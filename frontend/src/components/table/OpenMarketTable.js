@@ -11,7 +11,7 @@ function OpenMarketTable () {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/insurancedata");
+      const response = await axios.get("http://localhost:5000/api/data/insurance");
       setBrokerStatusData(response.data.results);
     } catch (error) {
       console.error("Error fetching data:", error);

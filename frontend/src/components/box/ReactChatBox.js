@@ -20,7 +20,7 @@ const ReactChatBox = () => {
 
     try {
       // Make a POST request to the chatbot API
-      const response = await fetch('http://localhost:5000/query', {
+      const response = await fetch('http://localhost:5000/api/nlp/naturallanguaugae', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -34,6 +34,7 @@ const ReactChatBox = () => {
       const data = await response.json();
 
       // Add bot response to chat history
+      console.log(data);
       setChatHistory(prev => [...prev, { message: data.data, sender: 'bot' }]);
     } catch (error) {
       console.error('Error sending message:', error);

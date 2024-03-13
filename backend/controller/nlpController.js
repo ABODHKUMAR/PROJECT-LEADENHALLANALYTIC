@@ -1,7 +1,5 @@
-// Import the database connection pool and OpenAI instance
 const express = require("express");
 const { OpenAI } = require("openai");
-// Controller function for handling NLP queries
 const mysql = require('mysql');
 
 const pool = mysql.createPool({
@@ -11,14 +9,16 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     connectionLimit: 10
 });
+
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY  // This is also the default, can be omitted
+    apiKey: process.env.OPENAI_API_KEY
 });
+
 const nlpController = async (req, res) => {
     let { query } = req.body;
+    let randomQuery = query;
     query = "Write a SQL query which computes " + query;
     try {
-        // Step 1: Convert natural language query to SQL using AI
         const chatCompletion = await openai.chat.completions.create({
             model: "gpt-3.5-turbo",
             messages: [
@@ -38,73 +38,80 @@ const nlpController = async (req, res) => {
             presence_penalty: 0
         });
 
-        // Log the entire response for debugging purposes
-        console.log(chatCompletion);
-
-        // Extract SQL query from the OpenAI response
         if (chatCompletion && chatCompletion.choices && chatCompletion.choices.length > 0) {
             let sqlQuery = chatCompletion.choices[0].message.content;
             console.log("Generated SQL Query:", sqlQuery);
 
-            // Check if the SQL query is a SELECT query
             if (!sqlQuery.toLowerCase().includes("select")) {
-                // Respond with a default message if it's not a SELECT query
                 console.error("Invalid SQL Query:", sqlQuery);
-                res.status(500).json({ error: "Hey, I'm Merra. How can I help you?" });
-                return; // Exit the function
+                const convertToNormal = await openai.chat.completions.create({
+                    model: "gpt-3.5-turbo",
+                    messages: [{ role: "user", content: "Response like chatbot , in 1 small line for :  " + randomQuery }],
+                    temperature: 0,
+                    max_tokens: 1024,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0
+                });
+        
+                if (convertToNormal && convertToNormal.choices && convertToNormal.choices.length > 0) {
+                    const data = convertToNormal.choices[0].message.content;
+                    res.status(200).json({ data });
+                } else {
+                    console.error("No valid response from OpenAI.");
+                    res.status(500).json({ data: "Not My fault open Ai api not working corretly" });
+                }
+                return;
             }
 
-            // Remove triple backticks and 'sql' code block formatting from the SQL query
             sqlQuery = sqlQuery.replace(/^```sql\n|```$/g, '');
-            console.log("Modified SQL Query:", sqlQuery); // Log the modified SQL query
+            console.log("Modified SQL Query:", sqlQuery);
 
-            // Execute the SQL query against the database
             pool.query(sqlQuery, async (error, results) => {
                 if (error) {
                     console.error("SQL Error:", error);
-                    // Check if it's a SQL syntax error
                     if (error.code === 'ER_PARSE_ERROR') {
-                        res.status(400).json({ error: 'Invalid SQL syntax' });
+                        res.status(400).json({ data: 'Please Clarify your question' });
                     } else {
-                        // For other types of errors, return a generic error message
-                        const errorMessage = "An error occurred while processing the request1";
-                        res.status(500).json({ error: errorMessage });
+                        const errorMessage = "Trust me you not asking a valid Question";
+                        res.status(500).json({ data: errorMessage });
                     }
                 } else {
-                    // Log the SQL results for debugging purposes
                     console.log("SQL Results:", results);
-            
-                    // Convert SQL results to normal English using OpenAI's chat completions
-                    const convertToNormal = await openai.chat.completions.create({
-                        model: "gpt-3.5-turbo",
-                        messages: [{ role: "user", content: "Convert to Normal English Like chat bot: " + JSON.stringify(results) }],
-                        temperature: 0,
-                        max_tokens: 1024,
-                        top_p: 1,
-                        frequency_penalty: 0,
-                        presence_penalty: 0
-                    });
-            
-                    if (convertToNormal && convertToNormal.choices && convertToNormal.choices.length > 0) {
-                        const data = convertToNormal.choices[0].message.content;
-                        // Send the converted data back to the client
-                        res.json({ data });
+
+                    if (!results || results.length === 0) {
+                        const errorMessage = "I don't understand your query. Could you please try again?";
+                        res.status(200).json({ data: errorMessage });
                     } else {
-                        console.error("No valid response from OpenAI.");
-                        res.status(500).json({ error: "No valid response from OpenAI" });
+                        const convertToNormal = await openai.chat.completions.create({
+                            model: "gpt-3.5-turbo",
+                            messages: [{ role: "user", content: "Convert to Normal English Like chat bot: " + JSON.stringify(results) }],
+                            temperature: 0,
+                            max_tokens: 1024,
+                            top_p: 1,
+                            frequency_penalty: 0,
+                            presence_penalty: 0
+                        });
+                
+                        if (convertToNormal && convertToNormal.choices && convertToNormal.choices.length > 0) {
+                            const data = convertToNormal.choices[0].message.content;
+                            res.status(200).json({ data });
+                        } else {
+                            console.error("No valid response from OpenAI.");
+                            res.status(500).json({ data: "Not My fault open Ai api not working corretly" });
+                        }
                     }
                 }
             });
-            
 
         } else {
             console.error("Invalid response from OpenAI.");
-            res.status(500).json({ error: "Hey, I'm Merra. How can I help you?" });
+            res.status(500).json({ data: "Our server openai not getting your query" });
         }
     } catch (error) {
-        console.error("Error:", error);
-        res.status(500).json({ error: "An error occurred while processing the request2" });
+        console.error("Error:", data);
+        res.status(500).json({ data: "Please ask a vallid question or try again " });
     }
 };
 
-module.exports = nlpController
+module.exports = nlpController;
