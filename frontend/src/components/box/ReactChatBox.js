@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ReactChatBox.css'; // import your CSS file
 import { TbMessageChatbot } from "react-icons/tb";
+
 const ReactChatBox = () => {
   const [inputText, setInputText] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
@@ -34,7 +35,6 @@ const ReactChatBox = () => {
       const data = await response.json();
 
       // Add bot response to chat history
-      console.log(data);
       setChatHistory(prev => [...prev, { message: data.data, sender: 'bot' }]);
     } catch (error) {
       console.error('Error sending message:', error);
@@ -48,11 +48,31 @@ const ReactChatBox = () => {
     }
   }, [chatHistory]);
 
+  useEffect(() => {
+    // Send initial message to chatbot API when component mounts
+    const sendInitialMessage = async () => {
+     
+       
+
+        const data ={
+          data:"Hey I am Meera chatbot, How can i help you ?"
+        };
+
+        // Add initial bot response to chat history
+        setChatHistory(prev => [...prev, { message: data.data, sender: 'bot' }]);
+      
+    };
+
+    if (showChat) {
+      sendInitialMessage();
+    }
+  }, [showChat]);
+
   return (
     <div>
       {!showChat && (
         <div className="chat-icon" onClick={toggleChat}>
-        <TbMessageChatbot/>
+          <TbMessageChatbot/>
         </div>
       )}
       {showChat && (
