@@ -16,18 +16,20 @@ const openai = new OpenAI({
 
 const nlpController = async (req, res) => {
     let { query } = req.body;
+    
     function testWordsInString(words, query) {
         return words.some(word => query.toLowerCase().includes(word.toLowerCase()));
     }
+    
     // Words to test
     const wordsToTest = ["insurancedata", "Year", "BrokerName", "GWP", "PlannedGWP", "MarketType", "PRIMARY KEY", "businessdata", "ClassOfBusiness", "ClassType", "BusinessPlan", "EarnedPremium"];
-    if(testWordsInString(wordsToTest, query)==false){
-        data={
-            "data":"Hey I am Merra Your Chatbot , How can I help you"
-        }
-        res.json({ data });
+    
+    if (!testWordsInString(wordsToTest, query)) {
+        const data = {
+            "data": "Hey I am Merra Your Chatbot , How can I help you ?"
+        };
+        res.json( data );
     }else{
-
     
     query = "Write a SQL query which computes " + query ;
     try {
